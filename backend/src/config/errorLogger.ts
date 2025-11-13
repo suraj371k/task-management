@@ -51,12 +51,10 @@ export const logError = async (params: LogErrorParams): Promise<void> => {
       userId: params.userId,
     });
     
-    // Also log to console in development
     if (process.env.NODE_ENV === 'development') {
       console.error('Error logged:', params);
     }
   } catch (logError) {
-    // If logging fails, at least log to console
     console.error('Failed to log error to database:', logError);
     console.error('Original error:', params);
   }
