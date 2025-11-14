@@ -26,7 +26,7 @@ This is a full stack web application build with modern technology i.e MERN stack
 
 ---
 
-## eatures
+## Features
 
 ### **Authentication**
 
