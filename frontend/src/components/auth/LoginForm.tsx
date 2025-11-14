@@ -15,7 +15,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { useLogin } from "@/hooks/useAuth";
+import { useLogin } from "@/hooks/auth/useAuth";
 import { Loader2, Mail, Lock } from "lucide-react";
 import { loginSchema } from "@/lib/validations/auth";
 

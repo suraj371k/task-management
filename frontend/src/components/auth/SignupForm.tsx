@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { useSignup } from "@/hooks/useAuth";
+import { useSignup } from "@/hooks/auth/useAuth";
 import { signupSchema } from "@/lib/validations/auth";
 
 import {

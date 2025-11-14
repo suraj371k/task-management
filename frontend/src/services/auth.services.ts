@@ -36,8 +36,6 @@ export const authService = {
   getProfile: async (): Promise<AuthResponse> => {
     try {
       const response = await backendUrl.get("/api/user/profile");
-      // Transform the response to match the expected schema
-      // Backend returns user with _id, but we need id
       const transformedData = {
         success: response.data.success,
         message: response.data.message,
@@ -52,7 +50,6 @@ export const authService = {
       };
       return authResponseSchema.parse(transformedData);
     } catch (error: any) {
-      // If validation fails, throw with more context
       console.error("Profile data transformation error:", error);
       throw error;
     }

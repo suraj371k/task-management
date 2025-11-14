@@ -20,18 +20,25 @@ export const addTask = async (req: Request, res: Response) => {
         .json({ success: false, message: "Missing required field" });
     }
 
+    const backendStatus = status === "done" ? "completed" : status;
+
     const task = await Task.create({
       userId,
       title,
       description,
       deadline,
-      status,
+      status: backendStatus,
       completed,
     });
 
+    const taskObj = task.toObject() as any;
+    if (taskObj.status === "completed") {
+      taskObj.status = "done";
+    }
+
     return res
       .status(201)
-      .json({ succcess: true, message: "task created successfully ", task });
+      .json({ success: true, message: "task created successfully ", task: taskObj });
   } catch (error: any) {
     console.log("Error in add task controller", error);
     logError({
@@ -58,9 +65,44 @@ export const getUsersTask = async (req: Request, res: Response) => {
 
     console.log(userId);
 
-    const tasks = await Task.find();
+    const tasks = await Task.find({ userId });
 
-    return res.status(200).json({ success: true, tasks });
+    const mappedTasks = tasks.map((task) => {
+      const taskObj = task.toObject() as any;
+      if (taskObj.status === "completed") {
+        taskObj.status = "done";
+      }
+      return taskObj;
+    });
+
+    const now = new Date();
+    const total = mappedTasks.length;
+    const completed = mappedTasks.filter(
+      (task: any) => task.completed === true || task.status === "done"
+    ).length;
+    const due = mappedTasks.filter(
+      (task: any) =>
+        new Date(task.deadline) < now &&
+        task.completed !== true &&
+        task.status !== "done"
+    ).length;
+    const upcoming = mappedTasks.filter(
+      (task: any) =>
+        new Date(task.deadline) >= now &&
+        task.completed !== true &&
+        task.status !== "done"
+    ).length;
+
+    return res.status(200).json({
+      success: true,
+      statistics: {
+        total,
+        completed,
+        due,
+        upcoming,
+      },
+      tasks: mappedTasks,
+    });
   } catch (error: any) {
     console.log("Error in add task controller", error);
     logError({
@@ -133,23 +175,45 @@ export const updateTask = async (req: Request, res: Response) => {
       });
     }
 
-    if (status) task.status = status;
+    if (status) {
+      if (status === "done") {
+        task.status = "completed";
+        task.completed = true;
+      } else {
+        task.status = status;
+        if (completed !== undefined) {
+          task.completed = completed;
+        }
+      }
+    }
 
     if (title) task.title = title;
 
-    if (description) task.description = description;
+    if (description !== undefined) task.description = description;
 
     if (deadline) task.deadline = deadline;
 
     if (priority) task.priority = priority;
 
-    if (completed) task.completed = completed;
+    if (!status && completed !== undefined) {
+      task.completed = completed;
+      if (completed) {
+        task.status = "completed";
+      } else if (task.status === "completed") {
+        task.status = "todo";
+      }
+    }
 
     await task.save();
 
+    const taskObj = task.toObject() as any;
+    if (taskObj.status === "completed") {
+      taskObj.status = "done";
+    }
+
     return res
       .status(200)
-      .json({ success: true, message: "task updated successfully", task });
+      .json({ success: true, message: "task updated successfully", task: taskObj });
   } catch (error: any) {
     console.log("Error in update task controller", error);
     logError({
@@ -176,13 +240,17 @@ export const getTaskById = async (req: Request, res: Response) => {
         .json({ success: false, message: "Internal server error" });
     }
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "task by id fetched successfully",
-        task,
-      });
+    // Map backend "completed" status to frontend "done" status
+    const taskObj = task.toObject() as any;
+    if (taskObj.status === "completed") {
+      taskObj.status = "done";
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "task by id fetched successfully",
+      task: taskObj,
+    });
   } catch (error: any) {
     console.log("Error in get task by id controller", error);
     logError({

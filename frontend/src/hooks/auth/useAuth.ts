@@ -8,7 +8,6 @@ export const useLogin = () => {
     mutationFn: authService.login,
     onSuccess: (data) => {
       if (data.success && data.user) {
-        // Store the full AuthResponse to match what getProfile returns
         queryClient.setQueryData(["user"], data);
       }
     },
@@ -22,7 +21,6 @@ export const useSignup = () => {
     mutationFn: authService.signup,
     onSuccess: (data) => {
       if (data.success && data.user) {
-        // Store the full AuthResponse to match what getProfile returns
         queryClient.setQueryData(["user"], data);
       }
     },
@@ -54,7 +52,6 @@ export const useResetPassword = () => {
     mutationFn: authService.resetPassword,
     onSuccess: (data) => {
       if (data.success && data.user) {
-        // Store the full AuthResponse to match what getProfile returns
         queryClient.setQueryData(["user"], data);
       }
     },
@@ -66,9 +63,7 @@ export const useProfile = () => {
     queryKey: ["user"],
     queryFn: authService.getProfile,
     retry: false,
-    // Keep stale data while refetching in background
     placeholderData: (previousData) => previousData,
-    // Use cached data initially, then refetch in background
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    staleTime: 1000 * 60 * 5, 
   });
 };

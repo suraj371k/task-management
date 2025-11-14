@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { useResetPassword } from "@/hooks/useAuth";
+import { useResetPassword } from "@/hooks/auth/useAuth";
 import { Loader2, ArrowLeft, CheckCircle2, Key, Lock } from "lucide-react";
 import { useState } from "react";
 
